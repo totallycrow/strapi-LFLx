@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_generic_custom_ad_breaks",
+  "info": {
+    "displayName": "CustomAdBreak"
+  },
+  "options": {},
+  "attributes": {
+    "type": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

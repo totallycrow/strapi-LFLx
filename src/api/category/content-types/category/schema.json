@@ -1,0 +1,61 @@
+{
+  "kind": "collectionType",
+  "collectionName": "categories",
+  "info": {
+    "singularName": "category",
+    "pluralName": "categories",
+    "displayName": "Category"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "uid"
+    },
+    "seo": {
+      "type": "component",
+      "component": "generic.seo",
+      "repeatable": false
+    },
+    "heroImage": {
+      "type": "component",
+      "component": "generic.hero-image",
+      "repeatable": false
+    },
+    "weight": {
+      "type": "integer"
+    },
+    "contentLong": {
+      "type": "text"
+    },
+    "contentShort": {
+      "type": "text"
+    },
+    "posts": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::post.post",
+      "mappedBy": "category"
+    },
+    "categories": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::category.category",
+      "mappedBy": "category"
+    },
+    "category": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::category.category",
+      "inversedBy": "categories"
+    },
+    "source": {
+      "type": "string"
+    }
+  }
+}

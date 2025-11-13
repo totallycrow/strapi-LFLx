@@ -1,0 +1,25 @@
+{
+  "collectionName": "components_generic_adsense_blocks",
+  "info": {
+    "displayName": "AdsenseBlock"
+  },
+  "options": {},
+  "attributes": {
+    "slotId": {
+      "type": "string"
+    },
+    "format": {
+      "type": "string"
+    },
+    "responsive": {
+      "type": "boolean"
+    },
+    "desktopOnly": {
+      "type": "boolean"
+    },
+    "label": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

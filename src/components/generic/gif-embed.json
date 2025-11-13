@@ -1,0 +1,16 @@
+{
+  "collectionName": "components_generic_gif_embeds",
+  "info": {
+    "displayName": "GifEmbed"
+  },
+  "options": {},
+  "attributes": {
+    "url": {
+      "type": "string"
+    },
+    "alt": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

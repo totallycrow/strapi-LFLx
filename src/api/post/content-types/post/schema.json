@@ -1,0 +1,70 @@
+{
+  "kind": "collectionType",
+  "collectionName": "posts",
+  "info": {
+    "singularName": "post",
+    "pluralName": "posts",
+    "displayName": "Post"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "uid"
+    },
+    "category": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::category.category",
+      "inversedBy": "posts"
+    },
+    "excerpt": {
+      "type": "text"
+    },
+    "datePublished": {
+      "type": "date"
+    },
+    "dateModified": {
+      "type": "date"
+    },
+    "showcaseDescription": {
+      "type": "text"
+    },
+    "seo": {
+      "type": "component",
+      "component": "generic.seo",
+      "repeatable": false
+    },
+    "heroImage": {
+      "type": "component",
+      "component": "generic.hero-image",
+      "repeatable": false
+    },
+    "contentArea": {
+      "type": "dynamiczone",
+      "components": [
+        "generic.adsense-block",
+        "generic.custom-ad-break",
+        "generic.gif-embed",
+        "generic.image-block",
+        "generic.image-link",
+        "generic.text-block",
+        "generic.video-embed"
+      ]
+    },
+    "author": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::author.author",
+      "inversedBy": "posts"
+    },
+    "source": {
+      "type": "string"
+    }
+  }
+}

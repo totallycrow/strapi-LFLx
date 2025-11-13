@@ -1,0 +1,16 @@
+{
+  "collectionName": "components_generic_video_embeds",
+  "info": {
+    "displayName": "videoEmbed"
+  },
+  "options": {},
+  "attributes": {
+    "url": {
+      "type": "string"
+    },
+    "caption": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

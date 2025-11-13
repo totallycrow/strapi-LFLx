@@ -1,0 +1,32 @@
+{
+  "collectionName": "components_generic_image_links",
+  "info": {
+    "displayName": "ImageLink"
+  },
+  "options": {},
+  "attributes": {
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "caption": {
+      "type": "string"
+    },
+    "alt": {
+      "type": "string"
+    },
+    "openInNewTab": {
+      "type": "boolean"
+    },
+    "url": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}
