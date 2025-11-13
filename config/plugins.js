@@ -2,6 +2,7 @@ const https = require('https');
 const { NodeHttpHandler } = require('@smithy/node-http-handler');
 
 module.exports = ({ env }) => {
+  
   const r2Endpoint = env('R2_ENDPOINT');
   // Remove bucket name from endpoint - it should only be in params.Bucket
   // Endpoint should be: https://<account-id>.r2.cloudflarestorage.com
@@ -67,5 +68,13 @@ module.exports = ({ env }) => {
         },
       },
     },
+    'deep-populate': {
+      enabled: true,
+      config: {
+        useCache: true, // default
+        replaceWildcard: true, // default
+      },
+    },
+    
   };
 };

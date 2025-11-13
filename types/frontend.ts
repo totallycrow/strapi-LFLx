@@ -6,6 +6,20 @@
  */
 
 // ============================================================================
+// Configuration
+// ============================================================================
+
+/**
+ * Strapi API Base URL (Production)
+ */
+export const STRAPI_BASE_URL = 'https://strapi-production-b5ca5.up.railway.app';
+
+/**
+ * Strapi API Endpoint
+ */
+export const STRAPI_API_URL = `${STRAPI_BASE_URL}/api`;
+
+// ============================================================================
 // Base Types
 // ============================================================================
 
@@ -298,9 +312,15 @@ export type PostsResponse = StrapiCollectionResponse<PostAttributes>;
 
 /**
  * Strapi Query Parameters
+ * 
+ * Supports standard Strapi populate as well as deep populate plugin syntax.
+ * With @fourlights/strapi-plugin-deep-populate enabled, you can use:
+ * - populate: '*' to deep populate all relations
+ * - populate: ['field1', 'field2'] for selective deep population
+ * - populate: { field: { populate: '*' } } for nested deep population
  */
 export interface StrapiQueryParams {
-  populate?: string | string[] | Record<string, unknown>;
+  populate?: '*' | string | string[] | Record<string, unknown>;
   fields?: string[];
   filters?: Record<string, unknown>;
   sort?: string | string[];
@@ -312,12 +332,28 @@ export interface StrapiQueryParams {
   };
   publicationState?: 'live' | 'preview';
   locale?: string;
+  /**
+   * Deep populate specific options (when using deep populate plugin)
+   */
+  deepPopulate?: {
+    omitEmpty?: boolean; // Omit empty relations from the response
+  };
 }
 
 /**
  * Common populate options for posts
+ * 
+ * With @fourlights/strapi-plugin-deep-populate enabled:
+ * - Use 'deep' option to populate all relations automatically
+ * - Standard 'all' and 'minimal' options still work with explicit populate
  */
 export const PostPopulateOptions = {
+  /**
+   * Deep populate all relations using wildcard (requires deep populate plugin)
+   */
+  deep: {
+    populate: '*',
+  },
   all: {
     populate: {
       author: {
@@ -351,8 +387,17 @@ export const PostPopulateOptions = {
 
 /**
  * Common populate options for authors
+ * 
+ * With @fourlights/strapi-plugin-deep-populate enabled:
+ * - Use 'deep' option to populate all relations automatically
  */
 export const AuthorPopulateOptions = {
+  /**
+   * Deep populate all relations using wildcard (requires deep populate plugin)
+   */
+  deep: {
+    populate: '*',
+  },
   all: {
     populate: ['avatar', 'posts'],
   },
@@ -363,8 +408,17 @@ export const AuthorPopulateOptions = {
 
 /**
  * Common populate options for categories
+ * 
+ * With @fourlights/strapi-plugin-deep-populate enabled:
+ * - Use 'deep' option to populate all relations automatically
  */
 export const CategoryPopulateOptions = {
+  /**
+   * Deep populate all relations using wildcard (requires deep populate plugin)
+   */
+  deep: {
+    populate: '*',
+  },
   all: {
     populate: {
       seo: {
@@ -381,6 +435,140 @@ export const CategoryPopulateOptions = {
     populate: ['seo', 'heroImage'],
   },
 } as const;
+
+// ============================================================================
+// Utility Functions
+// ============================================================================
+
+/**
+ * Build a Strapi API URL with query parameters
+ * 
+ * @param endpoint - API endpoint path (e.g., '/posts' or '/posts/1')
+ *                   Can be relative (will be prefixed with /api) or absolute
+ * @param params - Query parameters
+ * @returns Full URL with query string
+ * 
+ * @example
+ * buildStrapiUrl('/posts', { populate: '*', filters: { slug: { $eq: 'my-post' } } })
+ * buildStrapiUrl('/api/posts/1', { populate: '*' })
+ */
+export function buildStrapiUrl(
+  endpoint: string,
+  params?: StrapiQueryParams
+): string {
+  // Ensure endpoint starts with /api
+  const normalizedEndpoint = endpoint.startsWith('/api') 
+    ? endpoint 
+    : endpoint.startsWith('/')
+    ? `/api${endpoint}`
+    : `/api/${endpoint}`;
+  
+  const url = new URL(normalizedEndpoint, STRAPI_BASE_URL);
+  
+  if (params) {
+    // Handle populate parameter (supports deep populate plugin)
+    if (params.populate !== undefined) {
+      if (params.populate === '*') {
+        url.searchParams.append('populate', '*');
+      } else if (typeof params.populate === 'string') {
+        url.searchParams.append('populate', params.populate);
+      } else if (Array.isArray(params.populate)) {
+        params.populate.forEach((field) => {
+          url.searchParams.append('populate[]', field);
+        });
+      } else {
+        // For nested populate objects, we need to encode it properly
+        // Deep populate plugin handles this automatically when using '*'
+        url.searchParams.append('populate', JSON.stringify(params.populate));
+      }
+    }
+    
+    // Handle fields
+    if (params.fields) {
+      params.fields.forEach((field) => {
+        url.searchParams.append('fields[]', field);
+      });
+    }
+    
+    // Handle filters
+    if (params.filters) {
+      Object.entries(params.filters).forEach(([key, value]) => {
+        url.searchParams.append(`filters[${key}]`, JSON.stringify(value));
+      });
+    }
+    
+    // Handle sort
+    if (params.sort) {
+      if (typeof params.sort === 'string') {
+        url.searchParams.append('sort', params.sort);
+      } else if (Array.isArray(params.sort)) {
+        params.sort.forEach((sort) => {
+          url.searchParams.append('sort[]', sort);
+        });
+      }
+    }
+    
+    // Handle pagination
+    if (params.pagination) {
+      if (params.pagination.page !== undefined) {
+        url.searchParams.append('pagination[page]', params.pagination.page.toString());
+      }
+      if (params.pagination.pageSize !== undefined) {
+        url.searchParams.append('pagination[pageSize]', params.pagination.pageSize.toString());
+      }
+      if (params.pagination.start !== undefined) {
+        url.searchParams.append('pagination[start]', params.pagination.start.toString());
+      }
+      if (params.pagination.limit !== undefined) {
+        url.searchParams.append('pagination[limit]', params.pagination.limit.toString());
+      }
+    }
+    
+    // Handle publication state
+    if (params.publicationState) {
+      url.searchParams.append('publicationState', params.publicationState);
+    }
+    
+    // Handle locale
+    if (params.locale) {
+      url.searchParams.append('locale', params.locale);
+    }
+  }
+  
+  return url.toString();
+}
+
+/**
+ * Fetch data from Strapi API with deep populate support
+ * 
+ * @param endpoint - API endpoint path (e.g., '/posts' or '/posts/1')
+ * @param params - Query parameters (supports deep populate with populate: '*')
+ * @param options - Fetch options
+ * @returns Promise resolving to the response data
+ * 
+ * @example
+ * const post = await fetchStrapiData('/posts', { populate: '*' });
+ */
+export async function fetchStrapiData<T>(
+  endpoint: string,
+  params?: StrapiQueryParams,
+  options?: RequestInit
+): Promise<T> {
+  const url = buildStrapiUrl(endpoint, params);
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options?.headers,
+    },
+  });
+  
+  if (!response.ok) {
+    throw new Error(`Strapi API error: ${response.status} ${response.statusText}`);
+  }
+  
+  return response.json();
+}
 
 // ============================================================================
 // Utility Types
