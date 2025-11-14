@@ -397,7 +397,7 @@ export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
     name: Schema.Attribute.String;
     posts: Schema.Attribute.Relation<'oneToMany', 'api::post.post'>;
     publishedAt: Schema.Attribute.DateTime;
-    shortBio: Schema.Attribute.String;
+    shortBio: Schema.Attribute.Text;
     slug: Schema.Attribute.UID;
     source: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;

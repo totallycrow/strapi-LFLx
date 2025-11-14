@@ -15,7 +15,7 @@
       "type": "string"
     },
     "shortBio": {
-      "type": "string"
+      "type": "text"
     },
     "slug": {
       "type": "uid"
